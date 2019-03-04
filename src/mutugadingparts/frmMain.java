@@ -5,17 +5,33 @@
  */
 package mutugadingparts;
 
+import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author HP
  */
 public class frmMain extends javax.swing.JFrame {
-String Active = "A";
+String Active = "";
+Connection con;
     /**
      * Creates new form frmMain
      */
     public frmMain() {
         initComponents();
+        jButton1.setEnabled(true);
+    }
+
+    frmMain(String logedin) {
+        initComponents();
+        Active = logedin;
+        jButton1.setEnabled(false);
     }
 
     /**
@@ -35,8 +51,9 @@ String Active = "A";
         jPanel2 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        txtkode = new javax.swing.JTextField();
+        txtnamastok = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -69,6 +86,11 @@ String Active = "A";
         jLabel3.setText("Other sub title hire");
 
         jButton1.setText("Login");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -108,9 +130,18 @@ String Active = "A";
 
         jLabel5.setText("Nama");
 
-        jTextField1.setText("jTextField1");
+        txtkode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtkodeKeyPressed(evt);
+            }
+        });
 
-        jTextField2.setText("jTextField2");
+        jButton2.setText("Search");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -119,12 +150,17 @@ String Active = "A";
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-                    .addComponent(jTextField1))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtnamastok, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .addComponent(txtkode)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -133,12 +169,13 @@ String Active = "A";
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtkode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                    .addComponent(txtnamastok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton2))
         );
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -243,13 +280,110 @@ String Active = "A";
         else{
             jMenu2.setEnabled(false);
         }
+        tampil();
     }//GEN-LAST:event_formWindowOpened
-
+    public void tampil(){
+        if(txtkode.getText() != "")
+        {
+       DefaultTableModel tbl =new DefaultTableModel();
+       tbl.addColumn("Kode Barang");
+       tbl.addColumn("Nama Barang");
+       tbl.addColumn("Tanggal Terakhir Beli");
+       tbl.addColumn("Tanggal Terakhir Pakai");
+       tbl.addColumn("Qty Beli");
+       tbl.addColumn("Qty Pakai");
+       tbl.addColumn("Qty Akhir");
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
+                    + "SUM(b.QtyNota) pb,SUM(c.Qty) pj,SUM(b.QtyNota - c.Qty) QtyAkhir from stock a "
+                    + "left join pembelian b on a.id = b.StockID "
+                    + "left join pemakaian c on a.id = c.StockID "
+                    + "Where a.kodestock like '%"+txtkode.getText()+"%' "
+                    //+ "a.namastock like '%"+txtnamastok.getText()+"%')"
+                    + "GROUP BY a.kodestock,a.namastock";
+            Statement stmt = con.createStatement();
+            ResultSet rsst = stmt.executeQuery(query);
+                while(rsst.next()){
+                        tbl.addRow(new Object[]{
+                             rsst.getString(1),
+                             rsst.getString(2),
+                             rsst.getString(3),
+                             rsst.getString(4),
+                             rsst.getString(5),
+                             rsst.getString(6),
+                             rsst.getString(7)
+                            });
+                        jTable1.setModel(tbl);
+                }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+        }
+        else
+        {
+            DefaultTableModel tbl =new DefaultTableModel();
+       tbl.addColumn("Kode Barang");
+       tbl.addColumn("Nama Barang");
+       tbl.addColumn("Tanggal Terakhir Beli");
+       tbl.addColumn("Tanggal Terakhir Pakai");
+       tbl.addColumn("Qty Beli");
+       tbl.addColumn("Qty Pakai");
+       tbl.addColumn("Qty Akhir");
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
+                    + "SUM(b.QtyNota) pb,SUM(c.Qty) pj,SUM(b.QtyNota - c.Qty) QtyAkhir from stock a "
+                    + "left join pembelian b on a.id = b.StockID "
+                    + "left join pemakaian c on a.id = c.StockID "
+                    //+ "Where (a.kodestock like '%"+txtkode.getText()+"%' or "
+                    + "Where a.namastock like '%"+txtnamastok.getText()+"%'"
+                    + "GROUP BY a.kodestock,a.namastock";
+            Statement stmt = con.createStatement();
+            ResultSet rsst = stmt.executeQuery(query);
+                while(rsst.next()){
+                        tbl.addRow(new Object[]{
+                             rsst.getString(1),
+                             rsst.getString(2),
+                             rsst.getString(3),
+                             rsst.getString(4),
+                             rsst.getString(5),
+                             rsst.getString(6),
+                             rsst.getString(7)
+                            });
+                        jTable1.setModel(tbl);
+                }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+        }
+    }
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
         frmPemakaian pakai = new frmPemakaian();
         pakai.show();
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        tampil();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void txtkodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtkodeKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            tampil();
+        }
+    }//GEN-LAST:event_txtkodeKeyPressed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        frmLogin login = new frmLogin();
+        login.show();
+        dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -288,6 +422,7 @@ String Active = "A";
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -305,7 +440,7 @@ String Active = "A";
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField txtkode;
+    private javax.swing.JTextField txtnamastok;
     // End of variables declaration//GEN-END:variables
 }
