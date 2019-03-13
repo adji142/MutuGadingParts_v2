@@ -203,6 +203,7 @@ Integer id ;
         }
     }//GEN-LAST:event_pressed
 public void tampil(){
+//    Koneksi dan menampikan data pembelian
        DefaultTableModel tbl =new DefaultTableModel();
        tbl.addColumn("NoNota");
        tbl.addColumn("Tgl Nota");
@@ -231,6 +232,7 @@ public void tampil(){
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+//        Insert pembelian
         try {
             Statement stat = con.createStatement();
             String input = "insert into pembelian(NoNota,TglNota,QtyNota,HrgNota,StockID) values "
@@ -255,6 +257,7 @@ public void tampil(){
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+//        Hapus data pembelian
         String hapus =jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString();
         try {
             Statement stat = con.createStatement();

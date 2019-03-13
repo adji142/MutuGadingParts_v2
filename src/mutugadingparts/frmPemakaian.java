@@ -192,6 +192,7 @@ Integer id ;
         }
     }//GEN-LAST:event_pressed
 public void tampil(){
+//    Koneksi ke database dan menampikan data pemakaian sparepart
        DefaultTableModel tbl =new DefaultTableModel();
        tbl.addColumn("NoBukti");
        tbl.addColumn("Tgl Bukti");
@@ -218,6 +219,7 @@ public void tampil(){
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+//        Menambahkan data pemakaian
         try {
             Statement stat = con.createStatement();
             String input = "insert into Pemakaian(NoBukti,TglBukti,StockID,Qty) values "
@@ -232,6 +234,7 @@ public void tampil(){
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
+//        Menampilkan data saat form pemakaian di buka
         tampil();
     }//GEN-LAST:event_formWindowOpened
 
@@ -242,6 +245,7 @@ public void tampil(){
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+//        Hapus record pemakaian
         String hapus =jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString();
         try {
             Statement stat = con.createStatement();

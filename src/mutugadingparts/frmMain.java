@@ -18,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
  * @author HP
  */
 public class frmMain extends javax.swing.JFrame {
+//    Variable
 String Active = "";
 Connection con;
     /**
@@ -262,27 +263,31 @@ Connection con;
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
+//        Memanggil form input stock
         frmStock stk = new frmStock();
         stk.show();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO add your handling code here:
+//        Memanggil form input pembelian
         frmPembelian pb = new frmPembelian();
         pb.show();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
+//        Valdasi user yang login
         if(Active != ""){
             jMenu2.setEnabled(true);
         }
         else{
             jMenu2.setEnabled(false);
         }
-        tampil();
+        tampil(); // panggil function tampil untuk menampilkan data di database
     }//GEN-LAST:event_formWindowOpened
     public void tampil(){
+//        Menampilkan data dari database;
         if(txtkode.getText() != "")
         {
        DefaultTableModel tbl =new DefaultTableModel();
@@ -294,6 +299,7 @@ Connection con;
        tbl.addColumn("Qty Pakai");
        tbl.addColumn("Qty Akhir");
         try {
+//            Koneksi ke database mysql
             Class.forName("com.mysql.jdbc.Driver");
             con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
             String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
@@ -332,6 +338,7 @@ Connection con;
        tbl.addColumn("Qty Pakai");
        tbl.addColumn("Qty Akhir");
         try {
+//            Koneksi dengan relasi tabel
             Class.forName("com.mysql.jdbc.Driver");
             con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
             String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
@@ -362,17 +369,20 @@ Connection con;
     }
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
+//        Memanggil form pemakaian sparepart
         frmPemakaian pakai = new frmPemakaian();
         pakai.show();
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+//        Menampikan data dengan tombol search, panggil function tampil
         tampil();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void txtkodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtkodeKeyPressed
         // TODO add your handling code here:
+        //        Menampikan data dengan Press enter, panggil function tampil
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             tampil();
         }
