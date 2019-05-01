@@ -125,7 +125,7 @@ Connection con;
     public void log(){
     try {
         Class.forName("com.mysql.jdbc.Driver");
-        con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+        con=DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
         String query = "select * from users where user = '"+txtuser.getText()+"' and pass='"+txtpass.getText()+"'";
         Statement stmt = con.createStatement();
         ResultSet rsst = stmt.executeQuery(query);

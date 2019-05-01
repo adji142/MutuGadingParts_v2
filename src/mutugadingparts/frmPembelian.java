@@ -212,7 +212,7 @@ public void tampil(){
        tbl.addColumn("Harga");
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            con=DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
             String query = "select a.*,b.namastock from pembelian a inner join stock b on a.StockID = b.id ";
             Statement stmt = con.createStatement();
             ResultSet rsst = stmt.executeQuery(query);
@@ -272,7 +272,7 @@ public void tampil(){
     public void search(){
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            con=(com.mysql.jdbc.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            con=(com.mysql.jdbc.Connection) DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
             String query = "select * from stock where kodestock ='"+txtidbarang.getText()+"'";
             Statement stmt = con.createStatement();
             ResultSet rsst = stmt.executeQuery(query);

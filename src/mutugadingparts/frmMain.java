@@ -21,6 +21,7 @@ public class frmMain extends javax.swing.JFrame {
 //    Variable
 String Active = "";
 Connection con;
+String inout = "";
     /**
      * Creates new form frmMain
      */
@@ -137,7 +138,13 @@ Connection con;
             }
         });
 
-        jButton2.setText("Search");
+        txtnamastok.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtnamastokKeyPressed(evt);
+            }
+        });
+
+        jButton2.setText("Refresh Data");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -195,6 +202,11 @@ Connection con;
         jMenu1.setText("Aplication");
 
         jMenuItem1.setText("Login");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         jMenuItem5.setText("Exit");
@@ -278,56 +290,23 @@ Connection con;
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
 //        Valdasi user yang login
+        txtkode.setText("");
+        txtnamastok.setText("");
+        
         if(Active != ""){
             jMenu2.setEnabled(true);
+            jMenuItem1.setText("Logout");
+            inout = "out";
         }
         else{
             jMenu2.setEnabled(false);
+            jMenuItem1.setText("Login");
+            inout = "in";
         }
         tampil(); // panggil function tampil untuk menampilkan data di database
     }//GEN-LAST:event_formWindowOpened
-    public void tampil(){
-//        Menampilkan data dari database;
-        if(txtkode.getText() != "")
-        {
-       DefaultTableModel tbl =new DefaultTableModel();
-       tbl.addColumn("Kode Barang");
-       tbl.addColumn("Nama Barang");
-       tbl.addColumn("Tanggal Terakhir Beli");
-       tbl.addColumn("Tanggal Terakhir Pakai");
-       tbl.addColumn("Qty Beli");
-       tbl.addColumn("Qty Pakai");
-       tbl.addColumn("Qty Akhir");
-        try {
-//            Koneksi ke database mysql
-            Class.forName("com.mysql.jdbc.Driver");
-            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
-            String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
-                    + "SUM(b.QtyNota) pb,SUM(c.Qty) pj,SUM(b.QtyNota - c.Qty) QtyAkhir from stock a "
-                    + "left join pembelian b on a.id = b.StockID "
-                    + "left join pemakaian c on a.id = c.StockID "
-                    + "Where a.kodestock like '%"+txtkode.getText()+"%' "
-                    //+ "a.namastock like '%"+txtnamastok.getText()+"%')"
-                    + "GROUP BY a.kodestock,a.namastock";
-            Statement stmt = con.createStatement();
-            ResultSet rsst = stmt.executeQuery(query);
-                while(rsst.next()){
-                        tbl.addRow(new Object[]{
-                             rsst.getString(1),
-                             rsst.getString(2),
-                             rsst.getString(3),
-                             rsst.getString(4),
-                             rsst.getString(5),
-                             rsst.getString(6),
-                             rsst.getString(7)
-                            });
-                        jTable1.setModel(tbl);
-                }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e.getMessage());
-        }
-        }
-        else
+    public void tampil_nama(){
+        if(txtkode.getText().equals(""))
         {
             DefaultTableModel tbl =new DefaultTableModel();
        tbl.addColumn("Kode Barang");
@@ -340,7 +319,7 @@ Connection con;
         try {
 //            Koneksi dengan relasi tabel
             Class.forName("com.mysql.jdbc.Driver");
-            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            con=DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
             String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
                     + "SUM(b.QtyNota) pb,SUM(c.Qty) pj,SUM(b.QtyNota - c.Qty) QtyAkhir from stock a "
                     + "left join pembelian b on a.id = b.StockID "
@@ -367,6 +346,49 @@ Connection con;
         }
         }
     }
+    public void tampil(){
+//        Menampilkan data dari database;
+        if(txtnamastok.getText().equals(""))
+        {
+       DefaultTableModel tbl =new DefaultTableModel();
+       tbl.addColumn("Kode Barang");
+       tbl.addColumn("Nama Barang");
+       tbl.addColumn("Tanggal Terakhir Beli");
+       tbl.addColumn("Tanggal Terakhir Pakai");
+       tbl.addColumn("Qty Beli");
+       tbl.addColumn("Qty Pakai");
+       tbl.addColumn("Qty Akhir");
+        try {
+//            Koneksi ke database mysql
+            Class.forName("com.mysql.jdbc.Driver");
+            con=DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
+            String query = "select a.kodestock,a.namastock,MAX(b.TglNota) tglnota,MAX(c.TglBukti) tglpakai,"
+                    + "SUM(b.QtyNota) pb,SUM(c.Qty) pj,SUM(b.QtyNota - c.Qty) QtyAkhir from stock a "
+                    + "left join pembelian b on a.id = b.StockID "
+                    + "left join pemakaian c on a.id = c.StockID "
+                    + "Where a.kodestock like '%"+txtkode.getText()+"%' "
+                    //+ "a.namastock like '%"+txtnamastok.getText()+"%')"
+                    + "GROUP BY a.kodestock,a.namastock";
+            Statement stmt = con.createStatement();
+            ResultSet rsst = stmt.executeQuery(query);
+                while(rsst.next()){
+                        tbl.addRow(new Object[]{
+                             rsst.getString(1),
+                             rsst.getString(2),
+                             rsst.getString(3),
+                             rsst.getString(4),
+                             rsst.getString(5),
+                             rsst.getString(6),
+                             rsst.getString(7)
+                            });
+                        jTable1.setModel(tbl);
+                }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+        }
+        
+    }
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
 //        Memanggil form pemakaian sparepart
@@ -377,7 +399,15 @@ Connection con;
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
 //        Menampikan data dengan tombol search, panggil function tampil
-        tampil();
+        JOptionPane.showMessageDialog(rootPane, txtkode.getText());
+        if(txtnamastok.getText().equals("")){
+            tampil();
+            return;
+        }
+        if(txtkode.getText().equals("")){
+            tampil_nama();
+            return;
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void txtkodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtkodeKeyPressed
@@ -394,6 +424,30 @@ Connection con;
         login.show();
         dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void txtnamastokKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtnamastokKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            tampil_nama();
+        }
+    }//GEN-LAST:event_txtnamastokKeyPressed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        if(inout == "in"){
+            frmLogin login = new frmLogin();
+            login.show();
+            dispose();
+        }
+        else{
+            JOptionPane.showMessageDialog(rootPane, "Anda Sudah Logout");
+            inout = "in";
+            jMenu2.setEnabled(false);
+            jMenuItem1.setText("Login");
+            inout = "in";
+            jButton1.setEnabled(true);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments

@@ -30,7 +30,7 @@ Connection con;
        tbl.addColumn("Nama Stock");
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            con=DriverManager.getConnection("jdbc:mysql://localhost:3307/mutugadingparts", "root", "");
+            con=DriverManager.getConnection("jdbc:mysql://localhost/mutugadingparts", "root", "");
             String query = "select kodestock,namastock from stock ";
             Statement stmt = con.createStatement();
             ResultSet rsst = stmt.executeQuery(query);
